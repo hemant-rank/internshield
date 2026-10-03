@@ -1,0 +1,9 @@
+.deps
+.venv
+.venv312
+__pycache__
+**/__pycache__
+*.pyc
+*.log
+.env
+test_scoring.py
