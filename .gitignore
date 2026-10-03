@@ -11,3 +11,5 @@ frontend/.next/
 backend/.env
 frontend/.env.local
 *.log
+
+backend/.venv/
