@@ -1,185 +1,140 @@
 # InternShield 🛡️
 
-**Protecting Students from Fake Internship Offers**
+**AI-assisted verification for internship and job offer letters.**
 
-InternShield is a free, AI-powered tool that helps students verify the authenticity of internship and job offer letters. Upload or paste any offer letter and get an instant analysis with confidence score, red flags, and actionable next steps.
+InternShield helps students identify potentially fraudulent internship and job offers. Users can paste offer text or upload a document, then receive a risk score, a verdict, clear red flags, and suggested next steps.
 
-> **🚨 Every year, thousands of students in India fall victim to fake internship offers.** Scammers demand registration fees, collect sensitive documents, and waste students' time with non-existent positions. InternShield was built to fight back.
+> InternShield provides automated risk signals, not legal advice. Always verify an employer independently before paying money or sharing sensitive documents.
 
----
+## Features
 
-## ✨ Features
+- Analyze pasted text or upload PDF, DOCX, TXT, and common image files.
+- Detect fraud indicators with a **10-rule deterministic rule engine**.
+- Perform keyword-based NLP language analysis.
+- Extract companies, people, dates, email addresses, and phone numbers using regex-based NER.
+- Optionally check company name, website, and contact email evidence.
+- Show a confidence score, verdict, triggered flags, and recommended next steps.
+- Keep recent scans available in the browser session.
+- Use Supabase only when configured; otherwise operate without a database.
 
-- **Multi-format input** — Analyze PDFs, images (JPG/PNG), DOCX, TXT, or paste text directly
-- **8-point rule engine** — Checks for suspicious email domains, fake company names, urgency tactics, implausible stipends, missing fields, and more
-- **NLP language analysis** — Detects fraud indicators and genuine offer patterns using keyword-weighted classification
-- **Entity verification** — Extracts and verifies company names, people, dates, and contacts (spaCy NER or regex fallback)
-- **Enriched analysis** — Optionally provide company name, website, and email for deeper verification
-- **Education section** — Learn how to spot fake offers with a detailed fake vs. genuine comparison
-- **Privacy first** — No signup required, no data stored permanently, fully anonymous
-- **Session history** — Track your past scans within the browser session
+## How analysis works
 
----
-
-## 🏗️ Architecture
-
-```
-┌─────────────────────────┐     ┌─────────────────────────┐     ┌──────────────┐
-│   Next.js 16 Frontend   │────▶│    FastAPI Backend       │────▶│   Supabase   │
-│   (React 19, TypeScript)│◀────│    (Python 3.9+)        │◀────│  (Optional)  │
-└─────────────────────────┘     └─────────────────────────┘     └──────────────┘
-                                          │
-                                ┌─────────┼─────────┐
-                                ▼         ▼         ▼
-                          Rule Engine    NLP     NER/spaCy
-                          (8 rules)   (Keyword   (Entity
-                           30%       Analysis)  Extraction)
-                                      50%        20%
-```
-
-### ML Pipeline
+InternShield combines three signals into one score:
 
 | Component | Purpose | Weight |
-|-----------|---------|--------|
-| **Rule Engine** | 8 deterministic structural checks (email domain, stipend, fake companies, missing fields, dates, grammar, urgency, greeting) | 30% |
-| **NLP Classifier** | Keyword-weighted language pattern analysis (genuine vs fraud indicators) | 50% |
-| **NER Extractor** | Named entity extraction & verification using spaCy or regex fallback (companies, people, dates, contacts) | 20% |
+| --- | --- | --- |
+| Rule engine | Structural and known scam indicators | 30% |
+| NLP classifier | Fraud and genuine-language patterns | 50% |
+| Entity analysis | Extracted entities and verification signals | 20% |
 
-### Scoring
+### 10 rule-engine checks
+
+1. Suspicious email domains
+2. Implausible stipend amounts
+3. Known fake company names
+4. Missing offer-letter fields
+5. Date inconsistencies
+6. Poor grammar quality
+7. High-pressure or urgent language
+8. Generic greetings
+9. Suspicious links
+10. Registration-fee or payment demands
+
+### Verdicts
 
 | Score | Verdict |
-|-------|---------|
-| 75–100% | ✅ Likely Genuine |
-| 45–74% | ⚠️ Suspicious |
-| 0–44% | 🚨 Likely Fake |
+| --- | --- |
+| 75–100 | Likely Genuine |
+| 45–74 | Suspicious |
+| 0–44 | Likely Fake |
 
----
+## Architecture
 
-## 🚀 Quick Start
+```text
+Next.js 16 + React 19 frontend
+              │
+              ▼
+      FastAPI Python backend
+              │
+     ┌────────┼────────┐
+     ▼        ▼        ▼
+  10 rules    NLP      Entity extraction
+
+Optional: Supabase persistence for scans
+```
+
+## Tech stack
+
+- **Frontend:** Next.js 16, React 19, TypeScript, CSS Modules
+- **Backend:** FastAPI, Pydantic, Uvicorn
+- **Document processing:** pdfplumber, python-docx, Pillow, pytesseract
+- **Text analysis:** textstat, rapidfuzz, regex-based entity extraction
+- **Optional persistence:** Supabase/PostgreSQL
+- **Deployment:** Vercel (separate frontend and backend projects)
+
+## Run locally
 
 ### Prerequisites
 
-- **Python 3.9+** with pip
-- **Node.js 18+** with npm
+- Python 3.12+
+- Node.js 20+
+- npm
 
-### 1. Clone the Repository
+### 1. Start the backend
 
-```bash
-git clone https://github.com/Aadityavarier/internshield.git
-cd internshield
-```
+Open a terminal at the project root:
 
-### 2. Start the Backend
-
-```bash
+```powershell
 cd backend
-python -m venv venv
-
-# Windows
-venv\Scripts\activate
-# Mac/Linux
-# source venv/bin/activate
-
-pip install -r requirements.txt
-
-# Optional: install spaCy for enhanced NER (regex fallback works without it)
-# pip install spacy && python -m spacy download en_core_web_sm
-
-# Copy and fill env variables (optional — works without Supabase)
-copy .env.example .env
-
-# Run the server
-uvicorn main:app --reload --port 8000
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m uvicorn main:app --reload --port 8000
 ```
 
-The backend will start at `http://localhost:8000`.
+The API is available at `http://127.0.0.1:8000`.
 
-### 3. Start the Frontend
+### 2. Start the frontend
 
-```bash
+Open a second terminal at the project root:
+
+```powershell
 cd frontend
 npm install
+$env:NEXT_PUBLIC_API_URL = "http://127.0.0.1:8000"
 npm run dev
 ```
 
-The frontend will start at `http://localhost:3000`.
+Open `http://localhost:3000`.
 
-### 4. Open the App
+If port 8000 is unavailable, run the backend on another port (for example `8001`) and change `NEXT_PUBLIC_API_URL` to that same base URL. Do not append `/api`; the frontend adds it automatically.
 
-Navigate to [http://localhost:3000](http://localhost:3000) and start verifying offer letters!
-
----
-
-## 📁 Project Structure
-
-```
-internshield/
-├── backend/
-│   ├── main.py                    # FastAPI app, CORS, router mounting
-│   ├── requirements.txt           # Python dependencies
-│   ├── .env.example               # Environment variables template
-│   ├── data/
-│   │   ├── known_fake_companies.json
-│   │   └── suspicious_domains.json
-│   ├── models/
-│   │   └── schemas.py             # Pydantic request/response models
-│   ├── routers/
-│   │   └── analyze.py             # API endpoints (/analyze, /result, /history)
-│   └── services/
-│       ├── text_extractor.py      # PDF, image, DOCX, TXT extraction
-│       ├── rule_engine.py         # 8 rule-based fraud checks
-│       ├── nlp_classifier.py      # Keyword-weighted NLP classification
-│       ├── ner_extractor.py       # spaCy NER + regex fallback
-│       └── scorer.py              # Weighted ensemble scoring
-├── frontend/
-│   ├── package.json
-│   ├── tsconfig.json
-│   ├── next.config.ts
-│   └── src/
-│       ├── app/
-│       │   ├── layout.tsx         # Root layout (Navbar + Footer)
-│       │   ├── globals.css        # Design system (dark mode, glassmorphism)
-│       │   ├── page.tsx           # Homepage (hero, upload, education, about)
-│       │   ├── page.module.css    # Homepage styles
-│       │   ├── history/           # Scan history page
-│       │   └── result/[id]/       # Analysis result page
-│       ├── components/
-│       │   ├── Navbar.tsx         # Navigation bar
-│       │   └── Footer.tsx         # Footer with links & disclaimer
-│       └── lib/
-│           └── api.ts             # API client + session caching
-└── README.md
-```
-
----
-
-## 🔌 API Endpoints
+## API endpoints
 
 | Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/analyze` | Analyze an offer letter (file or text + optional company details) |
-| `GET` | `/api/result/{scan_id}` | Get full analysis result for a scan |
-| `GET` | `/api/history/{session_id}` | Get scan history for a browser session |
+| --- | --- | --- |
 | `GET` | `/api/health` | Health check |
+| `POST` | `/api/analyze` | Analyze an uploaded file or text |
+| `GET` | `/api/result/{scan_id}` | Retrieve one analysis result |
+| `GET` | `/api/history/{session_id}` | Retrieve session scan history |
 
-### POST /api/analyze
+### `POST /api/analyze` form fields
 
-**Form Data:**
-- `file` (optional) — PDF, DOCX, image, or TXT file
-- `text` (optional) — Plain text of the offer letter
-- `session_id` (required) — Browser session identifier
-- `company_name_input` (optional) — Company name from the letter
-- `company_website` (optional) — Company website URL
-- `contact_email` (optional) — Contact email from the letter
+| Field | Required | Description |
+| --- | --- | --- |
+| `session_id` | Yes | Browser/session identifier |
+| `file` | No | PDF, DOCX, TXT, or supported image |
+| `text` | No | Offer letter text |
+| `company_name_input` | No | Company name provided by the user |
+| `company_website` | No | Company website provided by the user |
+| `contact_email` | No | Contact email provided by the user |
 
----
+Provide either `file` or `text`.
 
-## 💾 Database (Optional)
+## Optional Supabase persistence
 
-InternShield works fully without a database — results are cached in-memory on the server and in `sessionStorage` on the client. For persistent storage:
+By default, results are kept in backend memory and browser session storage. This means scan history can disappear after a server restart or when a Vercel function instance changes.
 
-1. Create a project at [supabase.com](https://supabase.com)
-2. Run this SQL in the SQL editor:
+To persist scans, create a Supabase project, create the `scans` table below, and set `SUPABASE_URL` and `SUPABASE_KEY` for the backend.
 
 ```sql
 CREATE TABLE scans (
@@ -204,33 +159,51 @@ CREATE INDEX idx_scans_session_id ON scans(session_id);
 CREATE INDEX idx_scans_file_hash ON scans(file_hash);
 ```
 
-3. Add your credentials to `backend/.env`:
+For local development, add values to `backend/.env`:
+
+```env
+SUPABASE_URL=your-project-url
+SUPABASE_KEY=your-anon-key
 ```
-SUPABASE_URL=your_project_url
-SUPABASE_KEY=your_anon_key
+
+Never commit `.env` files or API keys.
+
+## Deploy on Vercel
+
+Deploy this repository as two Vercel projects:
+
+1. **Backend project**
+   - Root Directory: `backend`
+   - Framework: FastAPI/Python (auto-detected)
+2. **Frontend project**
+   - Root Directory: `frontend`
+   - Framework: Next.js
+   - Environment variable: `NEXT_PUBLIC_API_URL=https://YOUR-BACKEND.vercel.app`
+
+The API URL must be the backend base URL without `/api`.
+
+To enable persistence in production, add `SUPABASE_URL` and `SUPABASE_KEY` to the backend Vercel project's environment variables, then redeploy it.
+
+## Project structure
+
+```text
+internshield/
+├── backend/
+│   ├── data/                 # Known-company and domain data
+│   ├── models/               # Pydantic schemas
+│   ├── routers/              # FastAPI routes
+│   ├── services/             # Extraction, rules, NLP, scoring
+│   ├── main.py               # FastAPI application
+│   └── requirements.txt
+├── frontend/
+│   ├── public/
+│   ├── src/app/              # Pages and styles
+│   ├── src/components/
+│   ├── src/lib/api.ts        # Frontend API client
+│   └── package.json
+└── README.md
 ```
 
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-|-------|------------|
-| **Frontend** | Next.js 16, React 19, TypeScript, CSS Modules |
-| **Backend** | FastAPI, Python 3.9+, Pydantic v2 |
-| **ML/NLP** | Keyword-weighted NLP classifier, regex-based NER, spaCy (optional), textstat, rapidfuzz |
-| **OCR** | Tesseract (optional), pdfplumber, python-docx, Pillow |
-| **Database** | Supabase/PostgreSQL (optional — works without it) |
-| **Design** | Dark mode, glassmorphism, Inter font, micro-animations |
-
----
-
-## 📄 License
+## License
 
 This project is licensed under the [MIT License](LICENSE).
-
----
-
-## ⚠️ Disclaimer
-
-InternShield provides automated analysis and should **not** be treated as legal advice. Always independently verify offers through official channels. If you suspect fraud, report it at [cybercrime.gov.in](https://cybercrime.gov.in).
