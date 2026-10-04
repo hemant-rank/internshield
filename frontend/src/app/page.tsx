@@ -134,12 +134,12 @@ export default function HomePage() {
               </div>
               <div className={styles.statDivider} />
               <div className={styles.statItem}>
-                <span className={styles.statNumber}>₹200Cr+</span>
-                <span className={styles.statLabel}>lost to job scams in India</span>
+                <span className={styles.statNumber}>₹598Cr+</span>
+                <span className={styles.statLabel}>lost to job-related scams in Karnataka (2020-24)</span>
               </div>
               <div className={styles.statDivider} />
               <div className={styles.statItem}>
-                <span className={styles.statNumber}>8-Point</span>
+                <span className={styles.statNumber}>10-Point</span>
                 <span className={styles.statLabel}>verification system</span>
               </div>
             </div>
@@ -381,7 +381,7 @@ export default function HomePage() {
               <div className={styles.stepNumber}>2</div>
               <div className={styles.stepIcon}>🤖</div>
               <h3>AI Analyzes</h3>
-              <p>Our engine runs 8 rule-based checks, language pattern analysis, and entity verification simultaneously.</p>
+              <p>Our engine runs 10 rule-based checks, language pattern analysis, and entity verification simultaneously.</p>
             </div>
             <div className={styles.stepConnector}>→</div>
             <div className={styles.step}>
@@ -552,7 +552,7 @@ export default function HomePage() {
               <div className={styles.aboutIcon}>⚙️</div>
               <h3>How We Help</h3>
               <p>
-                Our analysis engine combines <strong>8 rule-based structural checks</strong>, <strong>NLP language pattern
+                Our analysis engine combines <strong>10 rule-based structural checks</strong>, <strong>NLP language pattern
                 analysis</strong>, and <strong>named entity verification</strong> to score any offer letter across multiple
                 dimensions. The result is a clear, actionable report — no signup required, no data stored permanently.
               </p>
