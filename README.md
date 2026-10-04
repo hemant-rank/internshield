@@ -137,9 +137,8 @@ Deploy this repository as two Vercel projects:
 2. **Frontend project**
    - Root Directory: `frontend`
    - Framework: Next.js
-   - Environment variable: `NEXT_PUBLIC_API_URL=https://YOUR-BACKEND.vercel.app`
 
-The API URL must be the backend base URL without `/api`.
+**Live application:** [https://internshield-v3qc.vercel.app/](https://internshield-v3qc.vercel.app/)
 
 ## Project structure
 
