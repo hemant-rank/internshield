@@ -134,8 +134,8 @@ export default function HomePage() {
               </div>
               <div className={styles.statDivider} />
               <div className={styles.statItem}>
-                <span className={styles.statNumber}>₹598Cr+</span>
-                <span className={styles.statLabel}>lost to job-related scams in Karnataka (2020-24)</span>
+                <span className={styles.statNumber}>₹276Cr+</span>
+                <span className={styles.statLabel}>reported job-fraud losses in India (2024)</span>
               </div>
               <div className={styles.statDivider} />
               <div className={styles.statItem}>
