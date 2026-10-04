@@ -15,7 +15,6 @@ InternShield helps students identify potentially fraudulent internship and job o
 - Optionally check company name, website, and contact email evidence.
 - Show a confidence score, verdict, triggered flags, and recommended next steps.
 - Keep recent scans available in the browser session.
-- Use Supabase only when configured; otherwise operate without a database.
 
 ## How analysis works
 
@@ -60,7 +59,6 @@ Next.js 16 + React 19 frontend
      ▼        ▼        ▼
   10 rules    NLP      Entity extraction
 
-Optional: Supabase persistence for scans
 ```
 
 ## Tech stack
@@ -69,7 +67,6 @@ Optional: Supabase persistence for scans
 - **Backend:** FastAPI, Pydantic, Uvicorn
 - **Document processing:** pdfplumber, python-docx, Pillow, pytesseract
 - **Text analysis:** textstat, rapidfuzz, regex-based entity extraction
-- **Optional persistence:** Supabase/PostgreSQL
 - **Deployment:** Vercel (separate frontend and backend projects)
 
 ## Run locally
@@ -130,44 +127,6 @@ If port 8000 is unavailable, run the backend on another port (for example `8001`
 
 Provide either `file` or `text`.
 
-## Optional Supabase persistence
-
-By default, results are kept in backend memory and browser session storage. This means scan history can disappear after a server restart or when a Vercel function instance changes.
-
-To persist scans, create a Supabase project, create the `scans` table below, and set `SUPABASE_URL` and `SUPABASE_KEY` for the backend.
-
-```sql
-CREATE TABLE scans (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  created_at TIMESTAMPTZ DEFAULT now(),
-  input_type TEXT,
-  extracted_text TEXT,
-  confidence_score NUMERIC,
-  verdict TEXT,
-  dimension_scores JSONB,
-  triggered_flags JSONB,
-  next_steps JSONB,
-  company_name TEXT,
-  session_id TEXT,
-  file_hash TEXT,
-  extraction_method TEXT,
-  processing_time_ms INT,
-  model_version TEXT DEFAULT 'v1.0'
-);
-
-CREATE INDEX idx_scans_session_id ON scans(session_id);
-CREATE INDEX idx_scans_file_hash ON scans(file_hash);
-```
-
-For local development, add values to `backend/.env`:
-
-```env
-SUPABASE_URL=your-project-url
-SUPABASE_KEY=your-anon-key
-```
-
-Never commit `.env` files or API keys.
-
 ## Deploy on Vercel
 
 Deploy this repository as two Vercel projects:
@@ -181,8 +140,6 @@ Deploy this repository as two Vercel projects:
    - Environment variable: `NEXT_PUBLIC_API_URL=https://YOUR-BACKEND.vercel.app`
 
 The API URL must be the backend base URL without `/api`.
-
-To enable persistence in production, add `SUPABASE_URL` and `SUPABASE_KEY` to the backend Vercel project's environment variables, then redeploy it.
 
 ## Project structure
 
@@ -203,7 +160,3 @@ internshield/
 │   └── package.json
 └── README.md
 ```
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
